@@ -5,16 +5,15 @@ import netflix_Background from "../utils/netflix_background.jpg";
 import Header from "./Header";
 import validateForm from "../utils/validateForm";
 import { app } from "../utils/Firebase";
-import { useNavigate } from "react-router-dom";
 import { updateProfile } from "firebase/auth";
 import { addUser } from "../utils/userSlice";
 import { useDispatch } from "react-redux";
+import { userLoginLogo } from "../utils/Constants";
 
 const Login = () => {
   const [isSignForm, setIsSignForm] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
-  const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleFormToggle = () => {
     setIsSignForm(!isSignForm);
@@ -22,80 +21,64 @@ const Login = () => {
 
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-  const nameRef = useRef(null)
+  const nameRef = useRef(null);
 
   const handleBtnClick = () => {
-    const message = validateForm(
-      emailRef.current.value,
-      passwordRef.current.value,
-      nameRef.current.value
-    );
+    const email = emailRef?.current?.value || "";
+  const password = passwordRef?.current?.value || "";
+  const name =  nameRef?.current?.value || "Guest" 
 
-    setErrorMsg(message);
+  const message = 
+     
+    validateForm(email, password); // Validate email and password for sign-in
 
+  setErrorMsg(message);
     if (message) return;
+  
+    const auth = getAuth(app);
+    
 
     if (!isSignForm) {
-      const auth = getAuth(app);
-      createUserWithEmailAndPassword(
-        auth,
-        emailRef.current.value,
-        passwordRef.current.value
-      )
+      createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed up
           const user = userCredential.user;
-          console.log(user);
+          
+          // Update user profile
           updateProfile(user, {
-            displayName: nameRef.current.value,
-            photoURL:
-              "https://avatars.githubusercontent.com/u/180944581?s=100&v=4",
+            displayName: name,
+            photoURL: userLoginLogo,
           })
-            .then(() => {
-              const { uid, email, displayName, photoURL } = auth.currentUser;
-              dispatch(
-                addUser({
-                  uid: uid,
-                  email: email,
-                  displayName: displayName,
-                  photoURL: photoURL,
-                })
-              );
-              navigate("/browse");
-            })
+          .then(() => {
+            // Fetch updated user data after profile update
+            const updatedUser = {
+              uid: user.uid,
+              email: user.email,
+              displayName: name, // Use the value you set
+              photoURL: userLoginLogo, // Use the value you set
+            };
+    
+            // Dispatch updated user to Redux
+            dispatch(addUser(updatedUser));
+          })
             .catch((error) => {
               setErrorMsg(error.message);
             });
-          
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          setErrorMsg(errorCode + "---" + errorMessage);
+          setErrorMsg(`${error.code} --- ${error.message}`);
         });
-        
-       
     } else {
-      const auth = getAuth(app);
-      signInWithEmailAndPassword(
-        auth,
-        emailRef.current.value,
-        passwordRef.current.value
-      )
+      signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed in
           const user = userCredential.user;
           console.log("user signed in", user);
-
-         
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          setErrorMsg(errorCode + "-" + errorMessage);
+          setErrorMsg(`${error.code} --- ${error.message}`);
         });
     }
   };
+  
 
   return (
     <div>
