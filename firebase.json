@@ -1,6 +1,7 @@
 {
   "hosting": {
-    "public": "build",
+    "site": "jetflixgpt", 
+    "public": "build",    
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -8,3 +9,4 @@
     ]
   }
 }
+
