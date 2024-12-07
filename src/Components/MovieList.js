@@ -1,8 +1,9 @@
 import React from 'react'
 import MovieCard from './MovieCard'
+import { Link, useParams } from 'react-router-dom'
 
 const MovieList = ({title , movies}) => {
-
+ 
   
   return (
    movies &&
@@ -10,7 +11,8 @@ const MovieList = ({title , movies}) => {
       <h1 className='text-3xl py-10 text-white'>{title}</h1>
     <div className='flex overflow-x-scroll'>
       <div className="flex ">{movies.map((movie)=>(
-             <MovieCard  key={movie.id} poster_path={movie.poster_path}></MovieCard>)
+        <Link  key={movie.id} to = {`/movies/${movie.id}`}>
+             <MovieCard  poster_path={movie.poster_path}></MovieCard> </Link>)
       )}</div>
       
       
