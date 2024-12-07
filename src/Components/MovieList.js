@@ -1,6 +1,6 @@
 import React from 'react'
 import MovieCard from './MovieCard'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 const MovieList = ({title , movies}) => {
  
